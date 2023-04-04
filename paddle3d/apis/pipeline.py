@@ -53,7 +53,10 @@ def training_step(model: paddle.nn.Layer,
     if optimizer.__class__.__name__ == 'OneCycleAdam':
         optimizer.before_iter(cur_iter - 1)
 
-    model.train()
+    if isinstance(model, paddle.DataParallel):
+        model._layers.train()
+    else:
+        model.train()
 
     if isinstance(model, paddle.DataParallel) and hasattr(model._layers, 'use_recompute') \
         and model._layers.use_recompute:

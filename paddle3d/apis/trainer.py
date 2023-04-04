@@ -434,3 +434,87 @@ class Trainer:
 
         metrics = metric_obj.compute(verbose=True)
         return metrics
+
+    def infer(self):
+        sync_bn = (getattr(self.model, 'sync_bn', False) and env.nranks > 1)
+        if sync_bn:
+            sparse_conv = False
+            for layer in self.model.sublayers():
+                if 'sparse' in str(type(layer)):
+                    sparse_conv = True
+                    break
+            if sparse_conv:
+                self.model = paddle.sparse.nn.SyncBatchNorm.convert_sync_batchnorm(
+                    self.model)
+            else:
+                self.model = paddle.nn.SyncBatchNorm.convert_sync_batchnorm(
+                    self.model)
+
+        if self.val_dataset is None:
+            raise RuntimeError('No evaluation dataset specified!')
+
+        self.model.eval()
+
+        for idx, sample in enumerate(self.eval_dataloader):
+            img = sample['img']
+            points = sample['points']
+            command = sample['command']
+
+            routing = []
+            for com in command:
+                # assert com in [0, 1, 2, 3], "com now is {}".format(com)
+                if com == 0:  # Left
+                    routing.append([[-20.0, 0, 0, 1.5, 1.5, 0]])
+                elif com == 1:  # Right
+                    routing.append([[20.0, 0, 0, 1.5, 1.5, 0]])
+                elif com == 2:  # forward
+                    routing.append([[0, 20.0, 0, 1.5, 1.5, 0]])
+                elif com == -1:  # fake data, will be discounted by setting loss_scale=0
+                    routing.append([[0, 0.0, 0, 1.5, 1.5, 0]])
+                else:
+                    routing.append([[0, 0.0, 0, 1.5, 1.5, 0]])
+            routing = paddle.to_tensor(routing, dtype=paddle.float32)
+
+            target_point = []
+            for com in command:
+                # assert com in [0, 1, 2, 3]
+                if com == 0:  # Left
+                    target_point.append([-20.0, 0])
+                elif com == 1:  # Right
+                    target_point.append([20.0, 0])
+                elif com == 2:
+                    target_point.append([0, 20.0])
+                elif com == -1:  # fake data, will be discounted by setting loss_scale=0
+                    target_point.append([0, 0.0])
+                else:
+                    target_point.append([0, 0.0])
+
+            target_point = paddle.to_tensor(target_point, dtype=paddle.float32)
+
+            modality = sample['modality']
+            lidar2img = sample['img_metas']['lidar2img']
+            pad_shape = sample['img_metas']['pad_shape']
+
+            import numpy as np
+            img.numpy().tofile('img.bin')
+            points.numpy().tofile('points.bin')
+            command.numpy().tofile('command.bin')
+            routing.numpy().tofile('routing.bin')
+            target_point.numpy().tofile('target_point.bin')
+
+            print("modality: ", modality)
+
+            cam_names = [
+                "cam_front", "cam_front_right", "cam_front_left", "cam_back",
+                "cam_back_left", "cam_back_right"
+            ]
+            for name, l2i in zip(cam_names, lidar2img):
+                l2i.numpy().tofile(name + '_lidar2img.bin')
+
+            pad_shape.numpy().tofile('pad_shape.bin')
+
+            with paddle.no_grad():
+                result = self.model(sample)
+
+            print(result)
+            raise
