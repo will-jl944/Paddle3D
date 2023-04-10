@@ -269,8 +269,28 @@ class Trainer:
                 self.model = paddle.sparse.nn.SyncBatchNorm.convert_sync_batchnorm(
                     self.model)
             else:
-                self.model = paddle.nn.SyncBatchNorm.convert_sync_batchnorm(
-                    self.model)
+                self.model.pts_voxel_encoder = paddle.nn.SyncBatchNorm.convert_sync_batchnorm(
+                    self.model.pts_voxel_encoder)
+                self.model.pts_middle_encoder = paddle.nn.SyncBatchNorm.convert_sync_batchnorm(
+                    self.model.pts_middle_encoder)
+                self.model.pts_neck = paddle.nn.SyncBatchNorm.convert_sync_batchnorm(
+                    self.model.pts_neck)
+                self.model.pts_lanes_head = paddle.nn.SyncBatchNorm.convert_sync_batchnorm(
+                    self.model.pts_lanes_head)
+                self.model.pts_det_traj_head = paddle.nn.SyncBatchNorm.convert_sync_batchnorm(
+                    self.model.pts_det_traj_head)
+                self.model.pts_traj_head = paddle.nn.SyncBatchNorm.convert_sync_batchnorm(
+                    self.model.pts_traj_head)
+                self.model.occupancy_head = paddle.nn.SyncBatchNorm.convert_sync_batchnorm(
+                    self.model.occupancy_head)
+                self.model.cam2bev_modules = paddle.nn.SyncBatchNorm.convert_sync_batchnorm(
+                    self.model.cam2bev_modules)
+                self.model.reduc_conv = paddle.nn.SyncBatchNorm.convert_sync_batchnorm(
+                    self.model.reduc_conv)
+                self.model.expand_conv = paddle.nn.SyncBatchNorm.convert_sync_batchnorm(
+                    self.model.expand_conv)
+                self.model.pnc_head = paddle.nn.SyncBatchNorm.convert_sync_batchnorm(
+                    self.model.pnc_head)
 
         model = self.model
         group = None
