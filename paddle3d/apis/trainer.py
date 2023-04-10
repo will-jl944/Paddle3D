@@ -502,8 +502,6 @@ class Trainer:
             routing.numpy().tofile('routing.bin')
             target_point.numpy().tofile('target_point.bin')
 
-            print("modality: ", modality)
-
             cam_names = [
                 "cam_front", "cam_front_right", "cam_front_left", "cam_back",
                 "cam_back_left", "cam_back_right"
