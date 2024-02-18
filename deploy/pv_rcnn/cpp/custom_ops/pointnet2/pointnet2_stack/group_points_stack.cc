@@ -14,7 +14,7 @@
 
 #include <vector>
 
-#include "paddle/include/experimental/ext_all.h"
+#include "paddle/extension.h"
 
 #define CHECK_INPUT(x) PD_CHECK(x.is_gpu(), #x " must be a GPU Tensor.")
 
@@ -31,7 +31,7 @@ void group_points_grad_kernel_launcher_stack(
     const int *features_batch_cnt, float *grad_features);
 
 // op forward wrapper
-std::vector<paddle::Tensor> group_points_cuda_forward(
+std::vector<paddle::Tensor> group_points_cuda_forward_stack(
     const paddle::Tensor &features_tensor,
     const paddle::Tensor &features_batch_cnt_tensor,
     const paddle::Tensor &idx_tensor,
@@ -62,7 +62,7 @@ std::vector<paddle::Tensor> group_points_cuda_forward(
 }
 
 // op backward wrapper
-std::vector<paddle::Tensor> group_points_cuda_backward(
+std::vector<paddle::Tensor> group_points_cuda_backward_stack(
     const paddle::Tensor &grad_out_tensor,
     const paddle::Tensor &features_tensor,
     const paddle::Tensor &features_batch_cnt_tensor,
@@ -96,7 +96,7 @@ std::vector<paddle::Tensor> group_points_cuda_backward(
 }
 
 // shape infer
-std::vector<std::vector<int64_t>> GroupInferShape(
+std::vector<std::vector<int64_t>> GroupInferShapeStack(
     std::vector<int64_t> features_shape,
     std::vector<int64_t> features_batch_cnt_shapeshape,
     std::vector<int64_t> idx_shape, std::vector<int64_t> idx_batch_cnt_shape) {
@@ -107,24 +107,24 @@ std::vector<std::vector<int64_t>> GroupInferShape(
 }
 
 // data type infer
-std::vector<paddle::DataType> GroupInferDtype(
+std::vector<paddle::DataType> GroupInferDtypeStack(
     paddle::DataType features_dtype, paddle::DataType features_batch_cnt_dtype,
     paddle::DataType idx_dtype, paddle::DataType idx_batch_cnt_dtype) {
   return {features_dtype};
 }
 
 // build forward op
-PD_BUILD_OP(grouping_operation)
+PD_BUILD_OP(grouping_operation_stack)
     .Inputs({"features_tensor", "features_batch_cnt_tensor", "idx_tensor",
              "idx_batch_cnt_tensor"})
     .Outputs({"out_tensor"})
-    .SetKernelFn(PD_KERNEL(group_points_cuda_forward))
-    .SetInferShapeFn(PD_INFER_SHAPE(GroupInferShape))
-    .SetInferDtypeFn(PD_INFER_DTYPE(GroupInferDtype));
+    .SetKernelFn(PD_KERNEL(group_points_cuda_forward_stack))
+    .SetInferShapeFn(PD_INFER_SHAPE(GroupInferShapeStack))
+    .SetInferDtypeFn(PD_INFER_DTYPE(GroupInferDtypeStack));
 
 // build backward op
-PD_BUILD_GRAD_OP(grouping_operation)
+PD_BUILD_GRAD_OP(grouping_operation_stack)
     .Inputs({paddle::Grad("out_tensor"), "features_tensor",
              "features_batch_cnt_tensor", "idx_tensor", "idx_batch_cnt_tensor"})
     .Outputs({paddle::Grad("features_tensor")})
-    .SetKernelFn(PD_KERNEL(group_points_cuda_backward));
+    .SetKernelFn(PD_KERNEL(group_points_cuda_backward_stack));

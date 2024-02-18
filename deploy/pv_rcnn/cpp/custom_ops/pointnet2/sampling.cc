@@ -14,7 +14,7 @@
 
 #include <vector>
 
-#include "paddle/include/experimental/ext_all.h"
+#include "paddle/extension.h"
 
 #define CHECK_INPUT(x) PD_CHECK(x.is_gpu(), #x " must be a GPU Tensor.")
 

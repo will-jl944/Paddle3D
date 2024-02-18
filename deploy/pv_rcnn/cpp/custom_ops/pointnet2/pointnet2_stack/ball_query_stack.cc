@@ -14,7 +14,7 @@
 
 #include <vector>
 
-#include "paddle/include/experimental/ext_all.h"
+#include "paddle/extension.h"
 
 #define CHECK_INPUT(x) PD_CHECK(x.is_gpu(), #x " must be a GPU Tensor.")
 
@@ -27,7 +27,7 @@ void ball_query_kernel_launcher_stack(const int b, const int m,
                                       const int *xyz_batch_cnt, int *idx);
 
 // op forward wrapper
-std::vector<paddle::Tensor> ball_query_cuda_forward(
+std::vector<paddle::Tensor> ball_query_cuda_forward_stack(
     const paddle::Tensor &new_xyz_tensor,
     const paddle::Tensor &new_xyz_batch_cnt_tensor,
     const paddle::Tensor &xyz_tensor,
@@ -54,7 +54,7 @@ std::vector<paddle::Tensor> ball_query_cuda_forward(
 }
 
 // shape infer
-std::vector<std::vector<int64_t>> BallQueryInferShape(
+std::vector<std::vector<int64_t>> BallQueryInferShapeStack(
     std::vector<int64_t> new_xyz_shape,
     std::vector<int64_t> new_xyz_batch_cnt_shape,
     std::vector<int64_t> xyz_shape, std::vector<int64_t> xyz_batch_cnt_shape,
@@ -63,18 +63,18 @@ std::vector<std::vector<int64_t>> BallQueryInferShape(
 }
 
 // data type infer
-std::vector<paddle::DataType> BallQueryInferDtype(
+std::vector<paddle::DataType> BallQueryInferDtypeStack(
     paddle::DataType new_xyz_type, paddle::DataType new_xyz_batch_cnt_type,
     paddle::DataType xyz_type, paddle::DataType xyz_batch_cnt_type) {
   return {paddle::DataType::INT32};
 }
 
 // build forward op
-PD_BUILD_OP(ball_query)
+PD_BUILD_OP(ball_query_stack)
     .Inputs({"new_xyz_tensor", "new_xyz_batch_cnt_tensor", "xyz_tensor",
              "xyz_batch_cnt_tensor"})
     .Outputs({"idx_tensor"})
     .Attrs({"radius: float", "nsample: int"})
-    .SetKernelFn(PD_KERNEL(ball_query_cuda_forward))
-    .SetInferShapeFn(PD_INFER_SHAPE(BallQueryInferShape))
-    .SetInferDtypeFn(PD_INFER_DTYPE(BallQueryInferDtype));
+    .SetKernelFn(PD_KERNEL(ball_query_cuda_forward_stack))
+    .SetInferShapeFn(PD_INFER_SHAPE(BallQueryInferShapeStack))
+    .SetInferDtypeFn(PD_INFER_DTYPE(BallQueryInferDtypeStack));

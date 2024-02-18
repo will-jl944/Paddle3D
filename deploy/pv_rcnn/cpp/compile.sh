@@ -26,7 +26,7 @@ LIB_DIR=/centerpoint/kaihuo/Paddle/build/paddle_inference_install_dir
 CUDNN_LIB=/usr/lib/x86_64-linux-gnu
 CUDA_LIB=/usr/local/cuda/lib64
 TENSORRT_ROOT=/centerpoint/two_three/Paddle/TensorRT-8.2.5.1
-CUSTOM_OPERATOR_FILES="custom_ops/voxel/voxelize_op.cc;custom_ops/voxel/voxelize_op.cu;custom_ops/iou3d_nms/iou3d_cpu.cpp;custom_ops/iou3d_nms/iou3d_nms_api.cpp;custom_ops/iou3d_nms/iou3d_nms.cpp;custom_ops/iou3d_nms/iou3d_nms_kernel.cu;custom_ops/pointnet2/sampling_gpu.cu;custom_ops/pointnet2/sampling.cc;custom_ops/pointnet2/ball_query_gpu.cu;custom_ops/pointnet2/ball_query.cc;custom_ops/pointnet2/group_points.cc;custom_ops/pointnet2/group_points_gpu.cu"
+CUSTOM_OPERATOR_FILES="custom_ops/voxel/voxelize_op.cc;custom_ops/voxel/voxelize_op.cu;custom_ops/iou3d_nms/iou3d_cpu.cpp;custom_ops/iou3d_nms/iou3d_nms_api.cpp;custom_ops/iou3d_nms/iou3d_nms.cpp;custom_ops/iou3d_nms/iou3d_nms_kernel.cu;custom_ops/pointnet2/sampling_gpu.cu;custom_ops/pointnet2/sampling.cc;custom_ops/pointnet2/gather_points_gpu.cu;custom_ops/pointnet2/gather_points.cc;custom_ops/pointnet2/voxel_query_gpu.cu;custom_ops/pointnet2/voxel_query.cc;custom_ops/pointnet2/pointnet2_batch/ball_query_gpu_batch.cu;custom_ops/pointnet2/pointnet2_batch/ball_query_batch.cc;custom_ops/pointnet2/pointnet2_batch/group_points_batch.cc;custom_ops/pointnet2/pointnet2_batch/group_points_gpu_batch.cu;custom_ops/pointnet2/pointnet2_stack/ball_query_gpu_stack.cu;custom_ops/pointnet2/pointnet2_stack/ball_query_stack.cc;custom_ops/pointnet2/pointnet2_stack/group_points_gpu_stack.cu;custom_ops/pointnet2/pointnet2_stack/group_points_stack.cc"
 
 
 cmake .. -DPADDLE_LIB=${LIB_DIR} \
